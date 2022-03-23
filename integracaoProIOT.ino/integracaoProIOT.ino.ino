@@ -1,3 +1,5 @@
+// == 23.3.22 -> Plano limitado (5000 uplinks), acredito que nem chegou nisso! Plano caro
+
 /************************** Inclusão das Bibliotecas **************************/
 
 #include <WiFi.h>
