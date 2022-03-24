@@ -46,7 +46,7 @@ const char DEVICE_KEY[]         = "O4DQCQXTCNBBVM8JZJPB";    //Digite a senha se
 
 DHT dht(DHTPIN, DHTTYPE);
 //IRrecv irrecv(IR_RECV_PIN);
-decode_results results;
+//decode_results results;
 //
 //int toggleState_1 = 0; //Defina o número inteiro para lembrar o estado de alternância para o relé 1
 //int toggleState_2 = 0; //Defina o número inteiro para lembrar o estado de alternância para o relé 2
