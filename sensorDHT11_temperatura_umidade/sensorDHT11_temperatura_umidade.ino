@@ -4,7 +4,7 @@
 #define DHTTYPE DHT11
 DHT dht = DHT(DHTPIN, DHTTYPE);
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   // Setup sensor:
   dht.begin();
 
