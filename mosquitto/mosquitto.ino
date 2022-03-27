@@ -13,7 +13,7 @@ const char* password = "samirinha01";
 /* this is the IP of PC/raspberry where you installed MQTT Server 
 on Wins use "ipconfig" 
 on Linux use "ifconfig" to get its IP address */
-const char* mqtt_server = "192.168.3.7";
+const char* mqtt_server = "192.168.3.12";
 
 float temperature = 0;
 
@@ -25,8 +25,8 @@ PubSubClient client(espClient);
 const char led = 12;
 
 /* topics */
-#define TEMP_TOPIC    "level"
-#define LED_TOPIC     "test/topic" /* 1=on, 0=off */
+#define TEMP_TOPIC    "test2"
+#define LED_TOPIC     "test2" /* 1=on, 0=off */
 
 long lastMsg = 0;
 char msg[20];
@@ -59,8 +59,32 @@ void mqttconnect() {
     /* connect now */
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
+
+      client.loop();
+      /* we measure temperature every 3 secs
+      we count until 3 secs reached to avoid blocking program if using delay()*/
+      long now = millis();
+      if (now - lastMsg > 3000) {
+        lastMsg = now;
+        /* read DHT11/DHT22 sensor and convert to string */
+        temperature = 15;
+        //if (!isnan(temperature)) {
+          snprintf (msg, 20, "%lf", temperature);
+          /* publish the message */
+          client.publish(TEMP_TOPIC, msg);
+        //}
+      }
+
+
+
+
+
+
+
+
+      
       /* subscribe topic with default QoS 0*/
-      client.subscribe(LED_TOPIC);
+      //client.subscribe(LED_TOPIC);
     } else {
       Serial.print("failed, status code =");
       Serial.print(client.state());
@@ -106,18 +130,18 @@ void loop() {
   }
   /* this function will listen for incomming 
   subscribed topic-process-invoke receivedCallback */
-  client.loop();
-  /* we measure temperature every 3 secs
-  we count until 3 secs reached to avoid blocking program if using delay()*/
-  long now = millis();
-  if (now - lastMsg > 3000) {
-    lastMsg = now;
-    /* read DHT11/DHT22 sensor and convert to string */
-    temperature = 15;
-    //if (!isnan(temperature)) {
-      snprintf (msg, 20, "%lf", temperature);
-      /* publish the message */
-      client.publish(TEMP_TOPIC, msg);
-    //}
-  }
+//  client.loop();
+//  /* we measure temperature every 3 secs
+//  we count until 3 secs reached to avoid blocking program if using delay()*/
+//  long now = millis();
+//  if (now - lastMsg > 3000) {
+//    lastMsg = now;
+//    /* read DHT11/DHT22 sensor and convert to string */
+//    temperature = 15;
+//    //if (!isnan(temperature)) {
+//      snprintf (msg, 20, "%lf", temperature);
+//      /* publish the message */
+//      client.publish(TEMP_TOPIC, msg);
+//    //}
+//  }
 }
