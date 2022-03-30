@@ -8,12 +8,12 @@ So it willpublish temperature topic and scribe topic bulb on/off
 #include <PubSubClient.h>
 
 /* change it with your ssid-password */
-const char* ssid = "FIBER-LVT-VANESSA";
-const char* password = "samirinha01";
+const char* ssid = "Carlos";//FIBER-LVT-VANESSA
+const char* password = "Qwerty2018";//samirinha01
 /* this is the IP of PC/raspberry where you installed MQTT Server 
 on Wins use "ipconfig" 
 on Linux use "ifconfig" to get its IP address */
-const char* mqtt_server = "192.168.3.12";
+const char* mqtt_server = "192.168.0.112";//109//111-linux
 
 float temperature = 0;
 
@@ -25,7 +25,7 @@ PubSubClient client(espClient);
 const char led = 12;
 
 /* topics */
-#define TEMP_TOPIC    "test2"
+#define TEMP_TOPIC    "teste3"//test2//linux
 #define LED_TOPIC     "test2" /* 1=on, 0=off */
 
 long lastMsg = 0;
@@ -72,17 +72,9 @@ void mqttconnect() {
           snprintf (msg, 20, "%lf", temperature);
           /* publish the message */
           client.publish(TEMP_TOPIC, msg);
+          client.disconnect();
         //}
       }
-
-
-
-
-
-
-
-
-      
       /* subscribe topic with default QoS 0*/
       //client.subscribe(LED_TOPIC);
     } else {
@@ -117,10 +109,10 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   /* configure the MQTT server with IPaddress and port */
-  client.setServer(mqtt_server, 1883);
+  client.setServer(mqtt_server, 5010);//1883//707
   /* this receivedCallback function will be invoked 
   when client received subscribed topic */
-  client.setCallback(receivedCallback);
+  //client.setCallback(receivedCallback);
 
 }
 void loop() {
