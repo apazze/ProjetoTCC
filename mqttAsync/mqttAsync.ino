@@ -4,6 +4,7 @@ This example uses FreeRTOS softwaretimers as there is no built-in Ticker library
 
 
 #include <WiFi.h>
+#include <ArduinoJson.h>
 extern "C" {
   #include "freertos/FreeRTOS.h"
   #include "freertos/timers.h"
@@ -54,12 +55,12 @@ void onMqttConnect(bool sessionPresent) {
   uint16_t packetIdSub = mqttClient.subscribe("test/lol", 2);
   Serial.print("Subscribing at QoS 2, packetId: ");
   Serial.println(packetIdSub);
-  mqttClient.publish("test/lol", 0, true, "test 1");
+  mqttClient.publish("test/lol", 0, true, getPayload().c_str());
   Serial.println("Publishing at QoS 0");
-  uint16_t packetIdPub1 = mqttClient.publish("test/lol", 1, true, "test 2");
+  uint16_t packetIdPub1 = mqttClient.publish("test/lol", 1, true, getPayload().c_str());
   Serial.print("Publishing at QoS 1, packetId: ");
   Serial.println(packetIdPub1);
-  uint16_t packetIdPub2 = mqttClient.publish("test/lol", 2, true, "test 3");
+  uint16_t packetIdPub2 = mqttClient.publish("test/lol", 2, true, getPayload().c_str());
   Serial.print("Publishing at QoS 2, packetId: ");
   Serial.println(packetIdPub2);
 }
@@ -121,14 +122,35 @@ void setup() {
   WiFi.onEvent(WiFiEvent);
 
   mqttClient.onConnect(onMqttConnect);
-  mqttClient.onDisconnect(onMqttDisconnect);
-  mqttClient.onSubscribe(onMqttSubscribe);
-  mqttClient.onUnsubscribe(onMqttUnsubscribe);
-  mqttClient.onMessage(onMqttMessage);
-  mqttClient.onPublish(onMqttPublish);
+  //mqttClient.onDisconnect(onMqttDisconnect);
+//  mqttClient.onSubscribe(onMqttSubscribe);
+//  mqttClient.onUnsubscribe(onMqttUnsubscribe);
+//  mqttClient.onMessage(onMqttMessage);
+//  mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
 
   connectToWifi();
+  Serial.print("Conected #########");
+//  mqttClient.subscribe("test/lol", 2);
+//  mqttClient.publish("test/lol", 1, true, getPayload().c_str());
+}
+
+String getPayload() {
+  DynamicJsonDocument doc(128);
+
+  JsonArray data = doc.createNestedArray("data");
+  JsonObject temmperature = data.createNestedObject();
+  temmperature["IdSensor"] = "1";
+  temmperature["NameSensor"] = "Temperatura";
+  temmperature["Type"] = "DHT11";
+  temmperature["Value"] = "12";
+  temmperature["Unit"] = "C";
+  //temmperature["DateTime"] = "30/3/2022 20:43";
+  String payload;
+
+  serializeJson(doc, payload);
+
+  return payload;
 }
 
 void loop() {
@@ -136,7 +158,7 @@ void loop() {
   if (now - lastMsg > 3000)
   {
     lastMsg = now;
-    mqttClient.publish("test/lol", 1, true, "test 2");
+    mqttClient.publish("test/lol", 1, true, getPayload().c_str());
   }
   
   
