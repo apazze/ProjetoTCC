@@ -136,15 +136,25 @@ void setup() {
 }
 
 String getPayload() {
-  DynamicJsonDocument doc(128);
+  //DynamicJsonDocument doc(128);
 
-  JsonArray data = doc.createNestedArray("data");
-  JsonObject temmperature = data.createNestedObject();
-  temmperature["IdSensor"] = "1";
-  temmperature["NameSensor"] = "Temperatura";
-  temmperature["Type"] = "DHT11";
-  temmperature["Value"] = "12";
-  temmperature["Unit"] = "C";
+  StaticJsonDocument<256> doc;
+
+  //doc["Id"] = "1";
+  doc["NameSensor"] = "Temperatura";
+  doc["Type"] = "DHT11";
+  doc["Value"] = "12";
+  doc["Unit"] = "C";
+
+  
+  //JsonArray data = doc.createNestedArray("DataSensor");
+  //JsonObject temmperature = data.createNestedObject();
+  //JsonObject temmperature = doc.as<JsonObject>();
+  //temmperature[String("Id")] = "1";
+//  temmperature["NameSensor"] = "Temperatura";
+//  temmperature["Type"] = "DHT11";
+//  temmperature["Value"] = "12";
+//  temmperature["Unit"] = "C";
   //temmperature["DateTime"] = "30/3/2022 20:43";
   String payload;
 
