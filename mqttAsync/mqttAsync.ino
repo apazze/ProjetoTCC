@@ -143,7 +143,7 @@ String getPayload() {
   //doc["Id"] = "1";
   doc["NameSensor"] = "Temperatura";
   doc["Type"] = "DHT11";
-  doc["Value"] = "12";
+  doc["Value"] = String(random(1.0, 80.0));
   doc["Unit"] = "C";
 
   

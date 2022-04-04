@@ -1,6 +1,8 @@
+//pinos sensor DHT11:
+//1(vcc) - 2(data) + resistor 10K no VCC - 4(gnd)
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
-#define DHTPIN 4
+#define DHTPIN 25
 #define DHTTYPE DHT11
 DHT dht = DHT(DHTPIN, DHTTYPE);
 void setup() {

@@ -25,7 +25,7 @@ void InicializaRTC()
     ImprimeData();
   
   //Necessita ajustar o relogio manualmente na primeira utilização:
-  //rtc.adjust(DateTime(2022, 3, 23, 20, 07, 00));
+  //rtc.adjust(DateTime(2022, 4, 3, 19, 00, 00));
   
   delay(100);
 }
