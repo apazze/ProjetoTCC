@@ -216,7 +216,7 @@ void InicializaWifiMqtt()
 
   WiFi.onEvent(WiFiEvent);
 
-  mqttClient.onConnect(onMqttConnect);
+  //mqttClient.onConnect(onMqttConnect);
   //mqttClient.onDisconnect(onMqttDisconnect);
 //  mqttClient.onSubscribe(onMqttSubscribe);
 //  mqttClient.onUnsubscribe(onMqttUnsubscribe);
@@ -287,14 +287,14 @@ void MonitorVazaoAgua()
     // caso ja seja 23:59:59 vamos enviar os dados por MQTT
     
     //if(now.hour() == 23 && now.minute() == 59 && now.second() == 59)
-    if(agora - lastMsg > 3000)
+    if(agora - lastMsg > 10000)
     {
        lastMsg = agora;
        Serial.println(" ---------------------------------- ");
        Serial.println(vazao_somando);
        Serial.println(" ---------------------------------- ");
 
-       String msg = getPayload("Vazao", "Encoder", String(random(1.0, 80.0)), "L");
+       String msg = getPayload("Vazao", "Encoder", String(random(3.0, 10.0)), "L");
 
        mqttClient.publish(topic, 0, true, msg.c_str());
        
