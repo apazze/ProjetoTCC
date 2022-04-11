@@ -13,7 +13,7 @@ extern "C" {
 #define WIFI_SSID "Adelia ACESSONET" // FIBER-LVT-VANESSA // Adelia ACESSONET
 #define WIFI_PASSWORD "02645674" // samirinha01 //02645674
 
-#define MQTT_HOST IPAddress(192, 168, 0, 101)
+#define MQTT_HOST IPAddress(192, 168, 0, 101) //104
 #define MQTT_PORT 5011
 #define topic "monitorAgua/vazao"
 #define topicAdvertencia "monitorAgua/advertencia"
@@ -39,6 +39,7 @@ float vazao = 0;
 float vazao_somando = 0;
 float MiliLitros = 0;
 long lastMsg = 0;
+bool gastouAgua = false;
 
 //RELE
 
@@ -289,8 +290,8 @@ void InicializaRele()
 
 void AcionaSirene()
 {
-  unsigned short quantidadeBeeps = 3;
-  unsigned short intervalo = 500;
+  unsigned short quantidadeBeeps = 2;
+  unsigned short intervalo = 200;
   while(quantidadeBeeps > 0)
   {
     digitalWrite(RELE, HIGH);
@@ -348,9 +349,12 @@ void MonitorVazaoAgua()
     
     // caso ja seja 23:59:59 vamos enviar os dados por MQTT
     
-    //if(agora - lastMsg > 10000)
-    if(now.hour() == 23 && now.minute() == 59 && now.second() == 59)
+    //if(agora - lastMsg > 20000)
+    //if(now.hour() == 23 && now.minute() == 59 && now.second() == 59)
+    //if(now.minute() % 10 == 0 && now.second() == 0 && gastouAgua)
+    if(now.second() == 30 && gastouAgua)
     {
+       gastouAgua = false;
        lastMsg = agora;
        Serial.println(" ---------------------------------- ");
        Serial.println(vazao_somando);
@@ -368,6 +372,7 @@ void MonitorVazaoAgua()
     if(MiliLitros > 0)
     {
       Serial.print(" Sensor de Vazao esta registrando "); Serial.print(MiliLitros); Serial.println(" litros/Segundo");
+      gastouAgua = true;
     }
 
   }
@@ -379,11 +384,11 @@ void setup()
   Serial.begin(115200);
   InicializaRTC();
   InicializaVazao();
-  InicializaRele();
   InicializaWifiMqtt();
+  InicializaRele();
 }
 
 void loop()
 {
-  MonitorVazaoAgua();
+  MonitorVazaoAgua();  
 }
