@@ -10,12 +10,13 @@ extern "C" {
 
 #include <AsyncMqttClient.h>
 
-#define WIFI_SSID "FIBER-LVT-VANESSA"
-#define WIFI_PASSWORD "samirinha01"
+#define WIFI_SSID "Adelia ACESSONET" // FIBER-LVT-VANESSA // Adelia ACESSONET
+#define WIFI_PASSWORD "02645674" // samirinha01 //02645674
 
-#define MQTT_HOST IPAddress(192, 168, 3, 9)
-#define MQTT_PORT 5010
+#define MQTT_HOST IPAddress(192, 168, 0, 101)
+#define MQTT_PORT 5011
 #define topic "monitorAgua/vazao"
+#define topicAdvertencia "monitorAgua/advertencia"
 
 AsyncMqttClient mqttClient;
 TimerHandle_t mqttReconnectTimer;
@@ -38,6 +39,10 @@ float vazao = 0;
 float vazao_somando = 0;
 float MiliLitros = 0;
 long lastMsg = 0;
+
+//RELE
+
+#define RELE 27
 
 //MONTAR PAYLOAD JSON
 
@@ -143,17 +148,17 @@ void onMqttConnect(bool sessionPresent)
   Serial.println("Connected to MQTT.");
   Serial.print("Session present: ");
   Serial.println(sessionPresent);
-  uint16_t packetIdSub = mqttClient.subscribe(topic, 2);
+  uint16_t packetIdSub = mqttClient.subscribe(topicAdvertencia, 2);
   Serial.print("Subscribing at QoS 2, packetId: ");
   Serial.println(packetIdSub);
-  mqttClient.publish(topic, 0, true, getPayload2().c_str());
-  Serial.println("Publishing at QoS 0");
-  uint16_t packetIdPub1 = mqttClient.publish(topic, 1, true, getPayload2().c_str());
-  Serial.print("Publishing at QoS 1, packetId: ");
-  Serial.println(packetIdPub1);
-  uint16_t packetIdPub2 = mqttClient.publish(topic, 2, true, getPayload2().c_str());
-  Serial.print("Publishing at QoS 2, packetId: ");
-  Serial.println(packetIdPub2);
+//  mqttClient.publish(topic, 0, true, getPayload2().c_str());
+//  Serial.println("Publishing at QoS 0");
+//  uint16_t packetIdPub1 = mqttClient.publish(topic, 1, true, getPayload2().c_str());
+//  Serial.print("Publishing at QoS 1, packetId: ");
+//  Serial.println(packetIdPub1);
+//  uint16_t packetIdPub2 = mqttClient.publish(topic, 2, true, getPayload2().c_str());
+//  Serial.print("Publishing at QoS 2, packetId: ");
+//  Serial.println(packetIdPub2);
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) 
@@ -198,6 +203,13 @@ void onMqttMessage(char* topicMsg, char* payload, AsyncMqttClientMessageProperti
   Serial.println(index);
   Serial.print("  total: ");
   Serial.println(total);
+
+  Serial.println("\n\n\n*******************PAYLOAD*****************");
+  Serial.println(payload);
+
+  Serial.println("*******************END*****************");
+
+  DeserializaPayloadJson(payload);
 }
 
 void onMqttPublish(uint16_t packetId) 
@@ -216,12 +228,12 @@ void InicializaWifiMqtt()
 
   WiFi.onEvent(WiFiEvent);
 
-  //mqttClient.onConnect(onMqttConnect);
+  mqttClient.onConnect(onMqttConnect);
   //mqttClient.onDisconnect(onMqttDisconnect);
-//  mqttClient.onSubscribe(onMqttSubscribe);
-//  mqttClient.onUnsubscribe(onMqttUnsubscribe);
-//  mqttClient.onMessage(onMqttMessage);
-//  mqttClient.onPublish(onMqttPublish);
+  //mqttClient.onSubscribe(onMqttSubscribe);
+  //mqttClient.onUnsubscribe(onMqttUnsubscribe);
+  mqttClient.onMessage(onMqttMessage);
+  //mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
 
   connectToWifi();
@@ -264,6 +276,56 @@ String getPayload2() {
   return payload;
 }
 
+// ADVERTENCIA RELE FUNCTION
+
+void InicializaRele()
+{
+  pinMode(RELE, OUTPUT);
+  digitalWrite(RELE, HIGH);
+  delay(500);
+  digitalWrite(RELE, LOW);
+  delay(500);
+}
+
+void AcionaSirene()
+{
+  unsigned short quantidadeBeeps = 3;
+  unsigned short intervalo = 500;
+  while(quantidadeBeeps > 0)
+  {
+    digitalWrite(RELE, HIGH);
+    delay(intervalo);
+    digitalWrite(RELE, LOW);
+    delay(intervalo);
+    quantidadeBeeps--;
+  }
+}
+
+void DeserializaPayloadJson(char* payload)
+{
+  StaticJsonDocument<200> doc;
+
+  DeserializationError error = deserializeJson(doc, payload);
+  if(error)
+  {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return;
+  }
+  
+  bool acionarSirene = doc["acionarSirene"];
+  String dataEnvio = doc["dataEnvio"];
+
+  Serial.print("Lido => "); 
+  Serial.print(acionarSirene); Serial.print(" | ");
+  Serial.print(dataEnvio);
+
+  if(acionarSirene)
+    AcionaSirene();
+
+  
+}
+
 //CORE FUNCTION
 
 void MonitorVazaoAgua()
@@ -286,8 +348,8 @@ void MonitorVazaoAgua()
     
     // caso ja seja 23:59:59 vamos enviar os dados por MQTT
     
-    //if(now.hour() == 23 && now.minute() == 59 && now.second() == 59)
-    if(agora - lastMsg > 10000)
+    //if(agora - lastMsg > 10000)
+    if(now.hour() == 23 && now.minute() == 59 && now.second() == 59)
     {
        lastMsg = agora;
        Serial.println(" ---------------------------------- ");
@@ -301,7 +363,7 @@ void MonitorVazaoAgua()
        //reinicia a contagem de vazao de agua diarios
        vazao_somando = 0;
     }
- 
+    
     // mostra o valor da leitura do sensor
     if(MiliLitros > 0)
     {
@@ -312,12 +374,12 @@ void MonitorVazaoAgua()
 }
 
 
-
 void setup()
 {
   Serial.begin(115200);
   InicializaRTC();
   InicializaVazao();
+  InicializaRele();
   InicializaWifiMqtt();
 }
 
