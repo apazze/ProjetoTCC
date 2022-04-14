@@ -152,6 +152,10 @@ void onMqttConnect(bool sessionPresent)
   uint16_t packetIdSub = mqttClient.subscribe(topicAdvertencia, 2);
   Serial.print("Subscribing at QoS 2, packetId: ");
   Serial.println(packetIdSub);
+
+  String msgParaEnvio = String(random(3.0, 10.0));
+  EnviaMsg(msgParaEnvio);
+  
 //  mqttClient.publish(topic, 0, true, getPayload2().c_str());
 //  Serial.println("Publishing at QoS 0");
 //  uint16_t packetIdPub1 = mqttClient.publish(topic, 1, true, getPayload2().c_str());
@@ -352,7 +356,8 @@ void MonitorVazaoAgua()
     //if(agora - lastMsg > 20000)
     //if(now.hour() == 23 && now.minute() == 59 && now.second() == 59)
     //if(now.minute() % 10 == 0 && now.second() == 0 && gastouAgua)
-    if(now.second() == 30 && gastouAgua)
+    //if(now.second() == 30 && gastouAgua)
+    if(now.second() % 10 == 0)
     {
        gastouAgua = false;
        lastMsg = agora;
@@ -360,9 +365,8 @@ void MonitorVazaoAgua()
        Serial.println(vazao_somando);
        Serial.println(" ---------------------------------- ");
 
-       String msg = getPayload("Vazao", "Encoder", String(random(3.0, 10.0)), "L");
-
-       mqttClient.publish(topic, 0, true, msg.c_str());
+       String msgParaEnvio = String(random(3.0, 10.0));
+       EnviaMsg(msgParaEnvio);
        
        //reinicia a contagem de vazao de agua diarios
        vazao_somando = 0;
@@ -376,6 +380,12 @@ void MonitorVazaoAgua()
     }
 
   }
+}
+
+void EnviaMsg(String msgParaEnvio)
+{
+  String msg = getPayload("Vazao", "Encoder", msgParaEnvio, "L");
+  mqttClient.publish(topic, 0, true, msg.c_str());
 }
 
 
