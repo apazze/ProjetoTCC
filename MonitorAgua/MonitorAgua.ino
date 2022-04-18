@@ -10,10 +10,10 @@ extern "C" {
 
 #include <AsyncMqttClient.h>
 
-#define WIFI_SSID "Adelia ACESSONET" // FIBER-LVT-VANESSA // Adelia ACESSONET
-#define WIFI_PASSWORD "02645674" // samirinha01 //02645674
+#define WIFI_SSID "Carlos" // FIBER-LVT-VANESSA // Adelia ACESSONET
+#define WIFI_PASSWORD "Qwerty2018" // samirinha01 //02645674
 
-#define MQTT_HOST IPAddress(192, 168, 0, 101) //104
+#define MQTT_HOST IPAddress(192, 168, 0, 104) //104
 #define MQTT_PORT 5011
 #define topic "monitorAgua/vazao"
 #define topicAdvertencia "monitorAgua/advertencia"
@@ -364,8 +364,10 @@ void MonitorVazaoAgua()
        Serial.println(" ---------------------------------- ");
        Serial.println(vazao_somando);
        Serial.println(" ---------------------------------- ");
-
-       String msgParaEnvio = String(random(3.0, 10.0));
+       
+       double val = random(0,99)/100.0;
+       val+=random(2.0, 10.0);
+       String msgParaEnvio = String(val);
        EnviaMsg(msgParaEnvio);
        
        //reinicia a contagem de vazao de agua diarios
