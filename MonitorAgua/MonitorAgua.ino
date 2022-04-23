@@ -99,16 +99,16 @@ void Configurar_interrupcao(gpio_num_t Port)
   //configura pino como entrada
   pinMode(portaVazao, INPUT_PULLUP);
   
-  //tipo de interrupçao
+  //tipo de interrupção
   gpio_set_intr_type(Port, GPIO_INTR_NEGEDGE);
 
   //ativa a porta
   gpio_intr_enable(Port);    
                     
-  //instala a interrupçao
+  //instala a interrupção
   gpio_install_isr_service(0);
   
-  //o que fazer ao detectar a interupçao
+  //o que fazer ao detectar a interrupção
   gpio_isr_handler_add(Port, Interrupcao, (void*) Port);
 }
 
