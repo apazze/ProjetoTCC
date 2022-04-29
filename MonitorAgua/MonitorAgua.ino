@@ -353,11 +353,12 @@ void MonitorVazaoAgua()
     
     // caso ja seja 23:59:59 vamos enviar os dados por MQTT
     
-    //if(agora - lastMsg > 20000)
-    //if(now.hour() == 23 && now.minute() == 59 && now.second() == 59)
     //if(now.minute() % 10 == 0 && now.second() == 0 && gastouAgua)
     //if(now.second() == 30 && gastouAgua)
-    if(now.second() % 10 == 0)
+    //if(now.second() % 10 == 0)
+
+    
+    if((now.hour() == 23 && now.minute() == 59 && now.second() == 59) && gastouAgua)
     {
        gastouAgua = false;
        lastMsg = agora;
