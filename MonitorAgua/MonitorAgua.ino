@@ -153,8 +153,8 @@ void onMqttConnect(bool sessionPresent)
   Serial.print("Subscribing at QoS 2, packetId: ");
   Serial.println(packetIdSub);
 
-  String msgParaEnvio = String(random(3.0, 10.0));
-  EnviaMsg(msgParaEnvio);
+  //String msgParaEnvio = String(random(3.0, 10.0));
+  //EnviaMsg(msgParaEnvio);
   
 //  mqttClient.publish(topic, 0, true, getPayload2().c_str());
 //  Serial.println("Publishing at QoS 0");
@@ -351,13 +351,7 @@ void MonitorVazaoAgua()
     // calcula a vazao total do dia
     vazao_somando = vazao_somando + MiliLitros;
     
-    // caso ja seja 23:59:59 vamos enviar os dados por MQTT
-    
-    //if(now.minute() % 10 == 0 && now.second() == 0 && gastouAgua)
-    //if(now.second() == 30 && gastouAgua)
-    //if(now.second() % 10 == 0)
-
-    
+    //As 23:59:59 se tiver consumo, envia valor
     if((now.hour() == 23 && now.minute() == 59 && now.second() == 59) && gastouAgua)
     {
        gastouAgua = false;
@@ -366,12 +360,14 @@ void MonitorVazaoAgua()
        Serial.println(vazao_somando);
        Serial.println(" ---------------------------------- ");
        
-       double val = random(0,99)/100.0;
-       val+=random(2.0, 10.0);
-       String msgParaEnvio = String(val);
+       //double val = random(0,99)/100.0;
+       //val+=random(2.0, 10.0);
+       //String msgParaEnvio = String(val);
+       
+       String msgParaEnvio = String(vazao_somando);
        EnviaMsg(msgParaEnvio);
        
-       //reinicia a contagem de vazao de agua diarios
+       //reinicia a contagem da vazao de agua diario
        vazao_somando = 0;
     }
     
