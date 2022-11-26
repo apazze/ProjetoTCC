@@ -10,10 +10,10 @@ extern "C" {
 
 #include <AsyncMqttClient.h>
 
-#define WIFI_SSID "Carlos" // FIBER-LVT-VANESSA // Adelia ACESSONET
-#define WIFI_PASSWORD "Qwerty2018" // samirinha01 //02645674
+#define WIFI_SSID "ALISSON-PC" // FIBER-LVT-VANESSA // Adelia ACESSONET // ASP // ALISSON
+#define WIFI_PASSWORD "12345678" // samirinha01 //02645674 // 12345678 // Qwerty2018
 
-#define MQTT_HOST IPAddress(192, 168, 0, 104) //104
+#define MQTT_HOST IPAddress(192, 168, 0, 111) //104
 #define MQTT_PORT 5011
 #define topic "monitorAgua/vazao"
 #define topicAdvertencia "monitorAgua/advertencia"
@@ -39,7 +39,8 @@ float vazao = 0;
 float vazao_somando = 0;
 float MiliLitros = 0;
 long lastMsg = 0;
-bool gastouAgua = false;
+bool gastandoAgora = false;
+bool masGastou = false;
 
 //RELE
 
@@ -296,6 +297,7 @@ void AcionaSirene()
 {
   unsigned short quantidadeBeeps = 2;
   unsigned short intervalo = 200;
+  Serial.println("\n\nRecebido msg para advertência!\n\n");
   while(quantidadeBeeps > 0)
   {
     digitalWrite(RELE, HIGH);
@@ -350,18 +352,22 @@ void MonitorVazaoAgua()
 
     // calcula a vazao total do dia
     vazao_somando = vazao_somando + MiliLitros;
-    
+
     //As 23:59:59 se tiver consumo, envia valor
-    if((now.hour() == 23 && now.minute() == 59 && now.second() == 59) && gastouAgua)
+    //if((now.hour() == 23 && now.minute() == 59 && now.second() == 59))
+    //if(now.second() % 10 == 0)
+
+    //verifica a cada 10s se gastou e nao esta gastando no momento pra enviar
+    if(now.second() % 10 == 0 && masGastou && !gastandoAgora)
     {
-       gastouAgua = false;
+       masGastou = false;
        lastMsg = agora;
        Serial.println(" ---------------------------------- ");
        Serial.println(vazao_somando);
        Serial.println(" ---------------------------------- ");
        
        //double val = random(0,99)/100.0;
-       //val+=random(2.0, 10.0);
+       //val+=random(2.0, 50.0);
        //String msgParaEnvio = String(val);
        
        String msgParaEnvio = String(vazao_somando);
@@ -371,13 +377,16 @@ void MonitorVazaoAgua()
        vazao_somando = 0;
     }
     
-    // mostra o valor da leitura do sensor
+    // Esta consumindo agua agora? Entao mostra o valor da leitura do sensor
     if(MiliLitros > 0)
     {
       Serial.print(" Sensor de Vazao esta registrando "); Serial.print(MiliLitros); Serial.println(" litros/Segundo");
-      gastouAgua = true;
+      gastandoAgora = true;
+      masGastou = true;
+    }else{
+      gastandoAgora = false;
     }
-
+    
   }
 }
 
