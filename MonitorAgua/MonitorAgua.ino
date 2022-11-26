@@ -13,7 +13,7 @@ extern "C" {
 #define WIFI_SSID "ALISSON-PC" // FIBER-LVT-VANESSA // Adelia ACESSONET // ASP // ALISSON
 #define WIFI_PASSWORD "12345678" // samirinha01 //02645674 // 12345678 // Qwerty2018
 
-#define MQTT_HOST IPAddress(192, 168, 0, 111) //104
+#define MQTT_HOST IPAddress(192, 168, 137, 1) //104
 #define MQTT_PORT 5011
 #define topic "monitorAgua/vazao"
 #define topicAdvertencia "monitorAgua/advertencia"
